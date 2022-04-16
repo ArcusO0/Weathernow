@@ -25,6 +25,7 @@ result = streamlit_bokeh_events(
     debounce_time=0)
 lat,lon = 0,0
 lats,lons = [],[]
+op2 = ['central','north','east','south','west']
 if result:
     if "GET_LOCATION" in result:
         lat = result.get("GET_LOCATION")['lat']
@@ -44,8 +45,10 @@ if lat != 0 and lon != 0:
         weatherdf = weatherdf.set_index("area")
         st.write("The weather now is: " + str(weatherdf.loc[curarea,'forecast']))
     elif chooseforecast == times[1]:
-        st.write("The weather now is: "+weather.json()['items'][0]['general']['forecast']) 
-    elif chooseforecast == times[2]:
         print(weather.json())
+        for i in range(len(op2)):
+            st.write("The weather now in "+op2[i]+' is: '+weather.json()['items'][0]['periods'][0]['regions'][op2[i]]) 
+    elif chooseforecast == times[2]:
+
         for i in range(4):
             st.write(datetime.strftime(datetime.strptime(weather.json()['items'][0]['forecasts'][i]['date'],'%Y-%m-%d'),'%d %B %Y')+': '+weather.json()['items'][0]['forecasts'][i]['forecast'])
