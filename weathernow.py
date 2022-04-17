@@ -5,7 +5,8 @@ from math import radians ,cos, sin, asin, sqrt
 from bokeh.models.widgets import Button
 from bokeh.models import CustomJS
 from streamlit_bokeh_events import streamlit_bokeh_events
-from datetime import datetime
+from datetime import datetime,date
+import pytz
 def havesine(lat1,lon1,lat2,lon2):
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
     dlon = lon2 - lon1 
@@ -45,7 +46,15 @@ if lat != 0 and lon != 0:
         weatherdf = weatherdf.set_index("area")
         st.write("The weather now is: " + str(weatherdf.loc[curarea,'forecast']))
     elif chooseforecast == times[1]:
-        times = ['Morning','Afternoon','Night']
+        now = datetime.now(pytz.timezone('Asia/Singapore'))
+        aft = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'12:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
+        night = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'18:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
+        if now > night:
+            times = ['Night','Morning','Afternoon']
+        elif now > aft:
+            times = ['Afternoon','Night','Morning']
+        else:
+            times = ['Morning','Afternoon','Night']
         optime = st.selectbox("Choose a time to look at",times)
         for i in range(len(op2)):
             st.write("The weather now in the "+op2[i]+' is: '+weather.json()['items'][0]['periods'][times.index(optime)]['regions'][op2[i]]) 
