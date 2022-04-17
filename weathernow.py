@@ -45,10 +45,10 @@ if lat != 0 and lon != 0:
         weatherdf = weatherdf.set_index("area")
         st.write("The weather now is: " + str(weatherdf.loc[curarea,'forecast']))
     elif chooseforecast == times[1]:
-        print(weather.json())
+        times = ['Morning','Afternoon','Night']
+        optime = st.selectbox("Choose a time to look at",times)
         for i in range(len(op2)):
-            st.write("The weather now in "+op2[i]+' is: '+weather.json()['items'][0]['periods'][0]['regions'][op2[i]]) 
+            st.write("The weather now in the "+op2[i]+' is: '+weather.json()['items'][0]['periods'][times.index(optime)]['regions'][op2[i]]) 
     elif chooseforecast == times[2]:
-
         for i in range(4):
             st.write(datetime.strftime(datetime.strptime(weather.json()['items'][0]['forecasts'][i]['date'],'%Y-%m-%d'),'%d %B %Y')+': '+weather.json()['items'][0]['forecasts'][i]['forecast'])
