@@ -49,15 +49,19 @@ if lat != 0 and lon != 0:
         now = datetime.now(pytz.timezone('Asia/Singapore'))
         aft = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'12:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
         night = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'18:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
+        names = []
         if now > night:
             times = ['Night','Morning','Afternoon']
+            names = [' at night',' in the morning',' in the afternoon']
         elif now > aft:
             times = ['Afternoon','Night','Morning']
+            names = [' in the afternoon',' at night',' in the morning']
         else:
             times = ['Morning','Afternoon','Night']
+            names = [' in the morning',' in the afternoon',' at night']
         optime = st.selectbox("Choose a time to look at",times)
         for i in range(len(op2)):
-            st.write("The weather now in the "+op2[i]+' is: '+weather.json()['items'][0]['periods'][times.index(optime)]['regions'][op2[i]]) 
+            st.write("The weather in the "+op2[i]+names[times.index(optime)]+' is: '+weather.json()['items'][0]['periods'][times.index(optime)]['regions'][op2[i]]) 
     elif chooseforecast == times[2]:
         for i in range(4):
             st.write(datetime.strftime(datetime.strptime(weather.json()['items'][0]['forecasts'][i]['date'],'%Y-%m-%d'),'%d %B %Y')+': '+weather.json()['items'][0]['forecasts'][i]['forecast'])
