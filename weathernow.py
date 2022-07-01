@@ -35,8 +35,14 @@ if result:
 if lat != 0 and lon != 0:
     times = ['2 hour weather forecast','24 hour weather forecast','4 day weather forecast']
     chooseforecast = st.selectbox("Choose a forecast",times)
+    now = datetime.now(pytz.timezone('Asia/Singapore'))
     weather = requests.get("https://api.data.gov.sg/v1/environment/"+chooseforecast.replace(' ','-'))
-    if chooseforecast == times[0]:
+    print(weather.json())
+    if chooseforecast != times[2]:
+        endtime = (weather.json()['items'][0]['valid_period']['end'])
+        endtime = datetime.strptime(endtime,"%Y-%m-%dT%H:%M:%S%z")
+    if chooseforecast == times[0] and now < endtime:
+        print(weather.json())
         dist = pd.DataFrame.from_dict(weather.json()['area_metadata'])
         for i in range(dist.shape[0]):
             dist.loc[i,'label_location'] = havesine(lat,lon,dist.loc[i,'label_location']['latitude'],dist.loc[i,'label_location']['longitude'])
@@ -45,8 +51,9 @@ if lat != 0 and lon != 0:
         curarea = st.selectbox("Select your location",dist['name'])
         weatherdf = weatherdf.set_index("area")
         st.write("The weather now is: " + str(weatherdf.loc[curarea,'forecast']))
-    elif chooseforecast == times[1]:
-        now = datetime.now(pytz.timezone('Asia/Singapore'))
+        st.write("Last updated: "+datetime.strftime(datetime.strptime(weather.json()['items'][0]['update_timestamp'],"%Y-%m-%dT%H:%M:%S%z"),"%a %d-%m-%Y %H:%M:%S"))
+    elif chooseforecast == times[1] and now < endtime:
+        print(weather.json())
         aft = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'12:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
         night = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'18:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
         names = []
@@ -62,6 +69,10 @@ if lat != 0 and lon != 0:
         optime = st.selectbox("Choose a time to look at",times)
         for i in range(len(op2)):
             st.write("The weather in the "+op2[i]+names[times.index(optime)]+' is: '+weather.json()['items'][0]['periods'][times.index(optime)]['regions'][op2[i]]) 
+        st.write("Last updated: "+datetime.strftime(datetime.strptime(weather.json()['items'][0]['update_timestamp'],"%Y-%m-%dT%H:%M:%S%z"),"%a %d-%m-%Y %H:%M:%S"))
     elif chooseforecast == times[2]:
         for i in range(4):
             st.write(datetime.strftime(datetime.strptime(weather.json()['items'][0]['forecasts'][i]['date'],'%Y-%m-%d'),'%d %B %Y')+': '+weather.json()['items'][0]['forecasts'][i]['forecast'])
+        st.write("Last updated: "+datetime.strftime(datetime.strptime(weather.json()['items'][0]['update_timestamp'],"%Y-%m-%dT%H:%M:%S%z"),"%a %d-%m-%Y %H:%M:%S"))
+    else:
+        st.write("The information is outdated, please refer to official NEA website for information")
