@@ -37,12 +37,10 @@ if lat != 0 and lon != 0:
     chooseforecast = st.selectbox("Choose a forecast",times)
     now = datetime.now(pytz.timezone('Asia/Singapore'))
     weather = requests.get("https://api.data.gov.sg/v1/environment/"+chooseforecast.replace(' ','-'))
-    print(weather.json())
     if chooseforecast != times[2]:
         endtime = (weather.json()['items'][0]['valid_period']['end'])
         endtime = datetime.strptime(endtime,"%Y-%m-%dT%H:%M:%S%z")
     if chooseforecast == times[0] and now < endtime:
-        print(weather.json())
         dist = pd.DataFrame.from_dict(weather.json()['area_metadata'])
         for i in range(dist.shape[0]):
             dist.loc[i,'label_location'] = havesine(lat,lon,dist.loc[i,'label_location']['latitude'],dist.loc[i,'label_location']['longitude'])
@@ -53,7 +51,6 @@ if lat != 0 and lon != 0:
         st.write("The weather now is: " + str(weatherdf.loc[curarea,'forecast']))
         st.write("Last updated: "+datetime.strftime(datetime.strptime(weather.json()['items'][0]['update_timestamp'],"%Y-%m-%dT%H:%M:%S%z"),"%a %d-%m-%Y %H:%M:%S"))
     elif chooseforecast == times[1] and now < endtime:
-        print(weather.json())
         aft = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'12:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
         night = datetime.strptime(datetime.strftime(datetime.now(pytz.timezone('Asia/Singapore')),"%Y-%m-%d ")+'18:00:00+08:00',"%Y-%m-%d %H:%M:%S%z")
         names = []
